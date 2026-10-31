@@ -1,0 +1,301 @@
+@import "tailwindcss";
+
+/*
+ * Bölüm seçimi (lib/bolum.ts): <html data-bolum="kuafor|guzellik"> (kuafor = Saç bölümü, guzellik = Gelin bölümü).
+ * Örn. `hidden kuafor:grid` yalnızca saç seçiliyken görünür; `secili:hidden` seçim yapılınca gizlenir.
+ * Öznitelik ilk boyamadan önce ayarlandığı için titreme olmaz ve JS'ye gerek kalmadan çalışır.
+ */
+@custom-variant kuafor (&:where([data-bolum="kuafor"] *));
+@custom-variant guzellik (&:where([data-bolum="guzellik"] *));
+@custom-variant secili (&:where([data-bolum] *));
+@custom-variant hareket (&:where([data-hareket="acik"] *));
+
+/*
+ * Tasarım tokenları — ayrıntı: docs/design-system.md
+ * Renkler işletmenin doğrulanmış kurumsal renkleri DEĞİLDİR; gerçek marka materyali gelince buradan değiştirilir.
+ */
+@theme {
+  --color-paper: #f5efe9;
+  --color-paper-deep: #ece4dc;
+  --color-ink: #1b1716;
+  --color-ink-soft: #2a2422;
+  --color-accent: #8a2f2b; /* vişne; paper üzerinde 7,3:1, paper-deep üzerinde 6,6:1. Koyu zeminde metin için accent-tint kullanılır */
+  --color-accent-deep: #6b2320;
+  --color-accent-tint: #f1dedb;
+
+  /* Sıcak taş tonları (Tailwind'in stone paletini geçersiz kılar) */
+  --color-stone-100: #e6dfd4;
+  --color-stone-200: #d6cdbf;
+  --color-stone-300: #bfb4a4;
+  --color-stone-400: #a39888;
+  --color-stone-500: #6b6358; /* açık zeminde küçük metin için en açık ton (paper 5,2:1, paper-deep 4,7:1) */
+  --color-stone-600: #524b42;
+  --color-stone-700: #3d3832;
+  --color-on-ink-muted: #b8b0a4; /* koyu zeminde ikincil metin */
+
+  --font-serif: var(--font-display), Georgia, serif;
+  --font-sans: var(--font-body), ui-sans-serif, system-ui, sans-serif;
+
+  /* Köşe: keskin salon dili, her yerde 2px */
+  --radius-ctl: 2px;
+  --radius-card: 2px;
+
+  /* Akışkan tipografi */
+  --text-display: clamp(2.5rem, 1.7rem + 4.6vw, 6.75rem);
+  --text-display--line-height: 1;
+  --text-h1: clamp(2.25rem, 1.65rem + 3vw, 4.5rem);
+  --text-h1--line-height: 1.03;
+  --text-h2: clamp(1.875rem, 1.45rem + 1.9vw, 3.25rem);
+  --text-h2--line-height: 1.08;
+  --text-h3: clamp(1.5rem, 1.3rem + 0.9vw, 2.125rem);
+  --text-h3--line-height: 1.15;
+  --text-lead: clamp(1.125rem, 1.04rem + 0.35vw, 1.375rem);
+  --text-lead--line-height: 1.6;
+
+  --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* Hero ve editoryal girişler CSS ile çalışır: JS gecikse de içerik görünür */
+  --animate-rise: rise 0.6s var(--ease-out-soft) both;
+  --animate-unveil: unveil 0.9s var(--ease-out-expo) both;
+  --animate-curtain: curtain 0.9s var(--ease-out-expo) both;
+  --animate-marquee: marquee 70s linear infinite;
+
+  @keyframes rise {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  @keyframes unveil {
+    from {
+      clip-path: inset(0 0 6% 0);
+      transform: scale(1.03);
+    }
+    to {
+      clip-path: inset(0 0 0% 0);
+      transform: scale(1);
+    }
+  }
+  @keyframes curtain {
+    from {
+      clip-path: inset(0 100% 0 0);
+      transform: scale(1.02);
+    }
+    to {
+      clip-path: inset(0 0% 0 0);
+      transform: scale(1);
+    }
+  }
+  @keyframes marquee {
+    from {
+      transform: translate3d(0, 0, 0);
+    }
+    to {
+      transform: translate3d(-50%, 0, 0);
+    }
+  }
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    scroll-padding-top: 5.5rem;
+    overflow-x: clip;
+  }
+  /* Gelin bölümünde vurgu rengi şampanya-kahveye kayar (paper üzerinde 5,4:1, paper-deep üzerinde 4,9:1) */
+  html[data-bolum="guzellik"] {
+    --color-accent: #7a5b3c;
+    --color-accent-deep: #5e4630;
+    --color-accent-tint: #efe4d6;
+  }
+  body {
+    background-color: var(--color-paper);
+    background-image:
+      radial-gradient(ellipse 80% 50% at 15% -5%, rgba(138, 47, 43, 0.06), transparent 70%),
+      radial-gradient(ellipse 60% 45% at 88% 8%, rgba(236, 228, 220, 0.7), transparent 65%);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    overflow-x: clip;
+    transition: background-color 0.5s var(--ease-out-soft);
+  }
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-serif);
+    font-weight: 400;
+    text-wrap: balance;
+    letter-spacing: -0.012em;
+  }
+  em {
+    font-style: italic;
+  }
+  /* DM Serif Display yalnızca 400 ağırlığında vardır; sahte kalın üretilmesin */
+  b,
+  strong {
+    font-weight: 600;
+  }
+  h1 b,
+  h1 strong,
+  h2 b,
+  h2 strong,
+  h3 b,
+  h3 strong {
+    font-weight: 400;
+  }
+  /* Mobilde alttaki sabit WhatsApp çubuğunun payı Footer'da (koyu zeminin altında açık şerit kalmasın diye) */
+  p {
+    text-wrap: pretty;
+  }
+  ::selection {
+    background: var(--color-accent);
+    color: var(--color-paper);
+  }
+  :focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 3px;
+  }
+  .on-ink :focus-visible {
+    outline-color: var(--color-paper);
+  }
+}
+
+@layer components {
+  .eyebrow {
+    font-family: var(--font-sans);
+    font-size: 0.75rem;
+    line-height: 1.4;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    font-weight: 500;
+  }
+  .container-x {
+    width: 100%;
+    max-width: 90rem;
+    margin-inline: auto;
+    padding-inline: clamp(1rem, 0.4rem + 2.6vw, 3rem);
+  }
+  .measure {
+    max-width: 66ch;
+  }
+  .link-underline {
+    background-image: linear-gradient(currentColor, currentColor);
+    background-size: 100% 1px;
+    background-position: 0 100%;
+    background-repeat: no-repeat;
+    transition:
+      background-size 0.45s var(--ease-out-soft),
+      color 0.3s var(--ease-out-soft);
+  }
+  @media (hover: hover) {
+    .link-underline:hover {
+      background-size: 0% 1px;
+      background-position: 100% 100%;
+    }
+  }
+
+  /* Kayarak dolan (slide-fill) editoryal düğme efekti */
+  .btn-slide {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    border-radius: var(--radius-ctl);
+  }
+  .btn-slide::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: var(--slide-bg, var(--color-accent));
+    transform: scaleX(0);
+    transform-origin: right center;
+    transition: transform 0.4s var(--ease-out-expo);
+  }
+  @media (hover: hover) {
+    .btn-slide:hover::before {
+      transform: scaleX(1);
+      transform-origin: left center;
+    }
+  }
+
+  /* Kart ve görsel çerçeveleri: küçük yarıçap */
+  .card-soft {
+    border-radius: var(--radius-card);
+    overflow: hidden;
+  }
+
+  /* Koyu (ink) bant: daha sık kullanılan tam genişlik koyu bölüm */
+  .band-ink {
+    background-color: var(--color-ink);
+    color: var(--color-paper);
+  }
+  .band-ink :focus-visible {
+    outline-color: var(--color-paper);
+  }
+  .band-ink .eyebrow {
+    color: var(--color-accent-tint);
+  }
+  .band-ink .text-muted-on {
+    color: var(--color-on-ink-muted);
+  }
+
+  /* İnce iç çerçeve */
+  .editorial-frame {
+    position: relative;
+  }
+  .editorial-frame::after {
+    content: "";
+    pointer-events: none;
+    position: absolute;
+    inset: 0.65rem;
+    border: 1px solid rgba(245, 239, 233, 0.28);
+    border-radius: var(--radius-ctl);
+    transition: inset 0.6s var(--ease-out-soft), border-color 0.6s var(--ease-out-soft);
+  }
+  @media (hover: hover) {
+    .group:hover .editorial-frame::after,
+    .editorial-frame:hover::after {
+      inset: 0.9rem;
+      border-color: rgba(245, 239, 233, 0.5);
+    }
+  }
+}
+
+/*
+ * İşletim sisteminde animasyonlar kapalıysa (prefers-reduced-motion: reduce) geçişleri sıfırlar;
+ * ANCAK kullanıcı `/animasyon` veya `?animasyon=1` ile zorunlu animasyon modunu (`data-hareket="acik"`)
+ * açtıysa tüm animasyonlar ve slide efektleri tam hızıyla çalışır.
+ */
+@media (prefers-reduced-motion: reduce) {
+  html:not([data-hareket="acik"]) *,
+  html:not([data-hareket="acik"]) *::before,
+  html:not([data-hareket="acik"]) *::after {
+    animation-duration: 0.01ms !important;
+    animation-delay: 0ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Lightbox (yet-another-react-lightbox) tema uyumu */
+.yarl__root {
+  --yarl__color_backdrop: rgba(27, 23, 22, 0.97);
+  --yarl__color_button: rgba(245, 239, 233, 0.85);
+  --yarl__color_button_active: #f5efe9;
+  --yarl__slide_title_color: #f5efe9;
+  --yarl__slide_description_color: #b8b0a4;
+  --yarl__slide_title_font_size: 1rem;
+  --yarl__slide_title_font_weight: 600;
+  --yarl__slide_captions_container_background: rgba(27, 23, 22, 0.75);
+  font-family: var(--font-sans);
+}
+.yarl__button {
+  min-width: 44px;
+  min-height: 44px;
+}
+
