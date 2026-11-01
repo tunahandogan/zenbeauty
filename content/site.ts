@@ -44,7 +44,7 @@ export const business = {
   },
   geo: { lat: 39.9048904, lng: 41.2677402, plusCode: "W739+X3 Yakutiye, Erzurum" },
   /** Anahtarsız Google Maps gömme adresi (iframe) */
-  mapEmbedUrl: "https://www.google.com/maps?q=Erzurum+Zen+Bayan+Kuaf%C3%B6r,+%C4%B0smetpa%C5%9Fa+Cd.,+Yakutiye&output=embed",
+  mapEmbedUrl: "https://www.google.com/maps?q=39.9048904,41.2677402&z=17&output=embed",
   mapTitle: "Zen Bayan Kuaför konumu, İsmetpaşa Caddesi, Yakutiye",
   instagram: {
     handle: "@erzurum_zenkuafor",
